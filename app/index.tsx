@@ -5,9 +5,12 @@ import {images, offers} from "@/constants";
 import {Fragment} from "react";
 import cn from 'clsx'
 import CartButton from "@/components/CartButton";
+import {Redirect} from "expo-router";
 
 export default function Index() {
-    return (
+    return <Redirect href="/(auth)/sign-in" />;
+    (
+
 
         <SafeAreaView className="flex-1 bg-white">
 
