@@ -17,7 +17,7 @@ import {useState} from "react";
             setIsSubmitting(true)
 
             try {
-                Alert.alert('Success', 'User signed in Successfully')
+
 
                 router.replace('/');
             } catch(error: any) {
