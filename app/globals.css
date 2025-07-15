@@ -1,139 +1,125 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { account, storage } from '@/lib/appwrite';
+import  useAuthStore  from '@/store/auth.store';
 
-@layer utilities {
-    .flex-center {
-        @apply flex items-center justify-center;
-    }
+export default function ProfileScreen() {
+const { user, logout } = useAuthStore();
+const [name, setName] = useState('');
+const [email, setEmail] = useState('');
+const [phone, setPhone] = useState('');
+const [address1, setAddress1] = useState('');
+const [address2, setAddress2] = useState('');
+const [profileImage, setProfileImage] = useState('');
+const [loading, setLoading] = useState(true);
 
-    .flex-between {
-        @apply flex items-center justify-between;
-    }
+useEffect(() => {
+    const fetchUserData = async () => {
+    if (user) {
+setName(user.name || 'User');
+setEmail(user.email || 'No email');
+setPhone(user.phone || 'No phone');
+setAddress1(user.address1 || 'No address');
+setAddress2(user.address2 || 'No address');
+setProfileImage(user.profileImage || '');
+setLoading(false);
+}
+};
+fetchUserData();
+}, [user]);
 
-    .flex-start {
-        @apply flex items-start justify-center;
-    }
+    const getInitials = () => {
+    if (!name) return 'U';
+    const names = name.split(' ');
+return names.length > 1 ? names[0][0] + names[1][0] : names[0][0];
+};
+
+    const handleEditProfile = () => {
+console.log('Edit profile clicked');
+};
+
+    const handleLogout = () => {
+logout();
+};
+
+    if (loading) {
+    return (
+    <View className="flex-1 flex-center">
+    <ActivityIndicator size="large" color="#FFA726" />
+    </View>
+);
 }
 
-@layer components {
-    .cart-btn {
-        @apply flex items-center justify-center size-10 rounded-full bg-dark-100;
-    }
+    return (
+    <SafeAreaView className="flex-1 bg-white">
+{/* Top Nav */}
+<View className="flex-between mx-4 my-4">
+<TouchableOpacity onPress={() => console.log('Back pressed')}>
+<Ionicons name="arrow-back" size={24} color="black" />
+</TouchableOpacity>
+<Text className="base-bold">Profile</Text>
+<TouchableOpacity onPress={() => console.log('Search pressed')}>
+<Feather name="search" size={24} color="black" />
+</TouchableOpacity>
+</View>
 
-    .cart-badge {
-        @apply absolute -top-2 -right-1 flex items-center justify-center size-5 bg-primary rounded-full;
-    }
+<ScrollView contentContainerStyle={styles.content}>
+                                                  {/* Profile Picture */}
+<View className="mt-5 flex-center">
+{profileImage ? (
+<Image
+source={{ uri: profileImage }}
+    className="profile-avatar"
+    onError={() => setProfileImage('')}
+/>
+) : (
+<View className="profile-avatar bg-primary/10 flex items-center justify-center">
+<Text className="text-3xl font-quicksand-bold text-white">{getInitials()}</Text>
+</View>
+)}
+<TouchableOpacity className="profile-edit" onPress={handleEditProfile}>
+<MaterialIcons name="edit" size={16} color="#fff" />
+</TouchableOpacity>
+</View>
 
-    .cart-item {
-        @apply flex flex-row items-end justify-between mb-4 bg-white rounded-xl p-3 shadow-md shadow-dark-100/10;
-    }
+{/* Profile Info */}
+<View className="bg-gray-100 p-5 m-5 rounded-xl w-[90%]">
+<InfoItem icon="person" label="Full Name" value={name} />
+<InfoItem icon="email" label="Email" value={email} />
+<InfoItem icon="call" label="Phone number" value={phone} />
+<InfoItem icon="location-on" label="Address 1 - (Home)" value={address1} />
+<InfoItem icon="location-on" label="Address 2 - (Work)" value={address2} />
+</View>
 
-    .cart-item__image {
-        @apply size-24 bg-primary/10 rounded-lg flex items-center justify-center;
-    }
+{/* Buttons */}
+<TouchableOpacity className="bg-amber-200 p-3.5 px-7 rounded-full border border-amber-500 mt-5" onPress={handleEditProfile}>
+<Text className="text-amber-500 paragraph-semibold">Edit Profile</Text>
+</TouchableOpacity>
 
-    .cart-item__actions {
-        @apply flex flex-row items-center justify-center size-5 bg-primary/10 rounded-md;
-    }
-
-    .custom-btn {
-        @apply bg-primary rounded-full p-3 w-full flex flex-row justify-center;
-    }
-
-    .custom-header {
-        @apply w-full flex flex-row items-center justify-between mb-10;
-    }
-
-    .label {
-        @apply text-base text-start w-full font-quicksand-medium text-gray-500 pl-2;
-    }
-
-    .input {
-        @apply rounded-lg p-3 w-full text-base font-quicksand-semibold text-dark-100 border-b leading-5;
-    }
-
-    .filter {
-        @apply px-6 py-3 rounded-full mr-2 shadow-sm shadow-black/10;
-    }
-
-    .menu-card {
-        @apply relative py-9 px-3.5 pt-24 flex items-center justify-end bg-white shadow-md shadow-black/10 rounded-3xl;
-    }
-
-    .profile-field {
-        @apply flex flex-row items-center justify-start mb-4;
-    }
-
-    .profile-field__icon {
-        @apply size-12 rounded-full bg-primary/10 flex items-center justify-center mr-3;
-    }
-
-    .searchbar {
-        @apply relative flex flex-row items-center justify-center w-full bg-white shadow-md shadow-black/10 rounded-full  font-quicksand-medium text-dark-100 gap-5;
-    }
-
-    .tab-icon {
-        @apply flex min-w-20 items-center justify-center min-h-full gap-1 mt-12;
-    }
-
-    .offer-card {
-        @apply w-full h-48 my-3 rounded-xl overflow-hidden shadow-lg flex items-center gap-5;
-    }
-
-    .offer-card__info {
-        @apply flex-1 h-full flex flex-col justify-center items-start gap-4;
-    }
-
-    .profile-avatar {
-        @apply relative size-28 border-white border-2 rounded-full;
-    }
-
-    .profile-edit {
-        @apply flex items-center justify-center absolute bottom-2 right-0 bg-primary border-2 border-white size-7 p-2 rounded-full;
-    }
-
-    .h1-bold {
-        @apply text-3xl font-quicksand-bold;
-    }
-
-    .h3-bold {
-        @apply text-xl font-quicksand-bold;
-    }
-
-    .base-bold {
-        @apply text-lg font-quicksand-bold !important;
-    }
-
-    .base-semibold {
-        @apply text-lg font-quicksand-semibold;
-    }
-
-    .base-regular {
-        @apply text-lg font-quicksand;
-    }
-
-    .paragraph-bold {
-        @apply text-base font-quicksand-bold;
-    }
-
-    .paragraph-semibold {
-        @apply text-base font-quicksand-semibold;
-    }
-
-    .paragraph-medium {
-        @apply text-base font-quicksand-medium;
-    }
-
-    .body-medium {
-        @apply text-sm font-quicksand-medium;
-    }
-
-    .body-regular {
-        @apply text-sm font-quicksand;
-    }
-
-    .small-bold {
-        @apply text-xs font-quicksand-bold;
-    }
+<TouchableOpacity className="bg-red-200 p-3.5 px-7 rounded-full border border-red-500 mt-5" onPress={handleLogout}>
+<Text className="text-red-500 paragraph-semibold">Logout</Text>
+</TouchableOpacity>
+</ScrollView>
+</SafeAreaView>
+);
 }
+
+const InfoItem = ({ icon, label, value }) => (
+<View className="flex-row items-start mb-5">
+<MaterialIcons name={icon} size={22} color="#FFA726" className="mr-3 mt-1" />
+<View>
+<Text className="body-medium text-gray-500">{label}</Text>
+<Text className="paragraph-semibold text-gray-800">{value || 'Not set'}</Text>
+</View>
+</View>
+);
+
+// Note: Since NativeWind doesn't use StyleSheet.create directly, styles are applied via className
+const styles = {
+    content: {
+    alignItems: 'center',
+    paddingBottom: 30,
+},
+};
