@@ -20,7 +20,7 @@ const MenuCard = ({ item: { $id, imageUrl, name, price } }: { item: MenuItem }) 
                 <ActivityIndicator size="small" color="#0000ff" />
             )}
             <Text className="text-center base-bold text-dark-100 mb-2" numberOfLines={1}>{name}</Text>
-            <Text className="body-regular text-gray-200 mb-4">From ${price}</Text>
+            <Text className="body-regular text-gray-200 mb-4">From R{price}</Text>
             <TouchableOpacity onPress={() => addItem({ id: $id, name, price, image_url: imageUrlWithProject, customizations: [] })}>
                 <Text className="paragraph-bold text-primary">Add to Cart +</Text>
             </TouchableOpacity>
